@@ -15,6 +15,15 @@ enum Status {
     INATIVO
 }
 
+enum StatusPT {
+    PROGRAMADA
+    ABERTA
+    ENCERRADA
+    CANCELADA
+    REVALIDADA
+    REPROGRAMADA
+}
+
 model Grupo {
     id          String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
     nome        String      @unique
@@ -34,4 +43,163 @@ model Usuario {
     grupo       Grupo       @relation(fields:[grupoId], references:[id])
     grupoId     String      @db.ObjectId
     @@map("usuarios")
+}
+
+model Local {
+    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    local                       String
+    latitude                    Float
+    longitude                   Float
+    pt                          PT[]
+    status                      Status          @default(ATIVO)
+    @@map("locais")
+}
+
+model Emitente {
+    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    nome                        String
+    sobrenome                   String
+    empresa                     String          @default("Engie")
+    gid                         String
+    email                       String
+    senha                       String
+    telefone                    String
+    pt                          PT[]
+    status                      Status          @default(ATIVO)
+    @@map("emitentes")
+}
+
+model Requisitante {
+    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    nome                        String
+    sobrenome                   String
+    empresa                     String
+    email                       String
+    senha                       String
+    telefone                    String
+    pt                          PT[]
+    status                      Status          @default(ATIVO)
+    @@map("requisitantes")
+}
+
+model Executante {
+    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    nome                        String
+    sobrenome                   String
+    empresa                     String
+    email                       String
+    senha                       String
+    telefone                    String
+    pt                          PT[]
+    status                      Status          @default(ATIVO)
+    @@map("executantes")
+}
+
+model HSE {
+    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    nome                        String
+    sobrenome                   String
+    empresa                     String
+    email                       String
+    senha                       String
+    telefone                    String
+    pt                          PT[]
+    status                      Status          @default(ATIVO)
+    @@map("hse")
+}
+
+model APR {
+    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    pdf                         Bytes
+    urlPDF                      String
+    pt                          PT[]
+    status                      Status          @default(ATIVO)
+    @@map("aprs")
+}
+
+model OrdemServico {
+    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    pdf                         Bytes
+    urlPDF                      String
+    pt                          PT[]
+    status                      Status          @default(ATIVO)
+    @@map("ordens_servico")
+}
+
+model EmpresaTerceirizada {
+    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    nome                        String
+    cnpj                        String
+    contrato                    String
+    pt                          PT[]
+    status                      Status          @default(ATIVO)
+    @@map("empresas_terceirizadas")
+}
+
+model EmpresaTerceirizada {
+    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    nome                        String
+    cnpj                        String
+    contrato                    String
+    pt                          PT[]
+    status                      Status          @default(ATIVO)
+    @@map("empresas_terceirizadas")
+}
+
+model Secao {
+    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    secao                       String
+    pt                          PT[]
+    status                      Status          @default(ATIVO)
+    @@map("sessoes")
+}
+model TipoTrabalho {
+    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    descricao                   String
+    pt                          PT[]
+    status                      Status          @default(ATIVO)
+    @@map("empresas_terceirizadas")
+}
+
+model PT {
+    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    criacao                     DateTime        @default(now())
+    emissao                     DateTime?
+    encerramento                DateTime?
+    revalidacao                 DateTime?
+    local                       Local           @relation(fields:[localId], references:[id])
+    localId                     String          @db.ObjectId
+    emitente                    Emitente        @relation(fields:[emitenteId], references:[id])
+    emitenteId                  String          @db.ObjectId
+    requisitante                Requisitante    @relation(fields:[requisitanteId], references:[id])
+    requisitanteId              String          @db.ObjectId
+    executante                  Executante      @relation(fields:[executanteId], references:[id])
+    executanteId                String          @db.ObjectId
+    hse                         HSE             @relation(fields:[hseId], references:[id])
+    hseId                       String          @db.ObjectId
+    apr                         APR             @relation(fields:[aprId], references:[id])
+    idAPR                       String          @db.ObjectId
+    ordemServico                OrdemServico    @relation(fields:[ordemServicoId], references:[id])
+    ordemServicoId              String          @db.ObjectId
+    empresaTerceirizada         EmpresaTerceirizada @relation(fields:[empresaTerceirizadaId], references:[id])
+    empresaTerceirizadaId       String?         @db.ObjectId
+    descricao                   String
+    tipoTrabalho                TipoTrabalho    @relation(fields:[tipoTrabalhoId], references:[id])
+    tipoTrabalhoId              String          @db.ObjectId
+    secao                       Secao           @relation(fields:[secaoId], references:[id])
+    secaoId                     String          @db.ObjectId
+    qtdeProprios                Int             @default(1)
+    qtdeTerceirizados           Int?            @default(0)
+    qtdeVeiculosLeves           Int?            @default(0)
+    qtdeVeiculosPesados         Int?            @default(0)
+    emitenteRevalidacao         Emitente?       @relation(fields:[emitenteRevalidacaoId], references:[id])
+    emitenteRevalidacaoId       String?         @db.ObjectId
+    requisitanteRevalidacao     Requisitante?   @relation(fields:[requisitanteRevalidacaoId], references:[id])
+    requisitanteRevalidacaoId   String?         @db.ObjectId
+    executanteRevalidacao       Executante      @relation(fields:[executanteRevalidacaoId], references:[id])
+    executanteRevalidacaoId     String?         @db.ObjectId
+    hseRevalidacao              HSE             @relation(fields:[hseRevalidacaoId], references:[id])
+    hseRevalidacaoId            String?         @db.ObjectId
+    status                      StatusPT        @default(PROGRAMADA)
+    @@map("permissoes_trabalho")
 }
