@@ -29,7 +29,7 @@ async function verificarCredenciais(req: NextApiRequest, res: NextApiResponse) {
 
         const usuario = await prisma.usuario.findUnique({
             where: {
-                email: gid
+                gid: gid
             },
         });
 
@@ -44,6 +44,7 @@ async function verificarCredenciais(req: NextApiRequest, res: NextApiResponse) {
                         mensagem: 'Autenticado realizada com sucesso!',
                         gid: usuario.gid,
                         nome: usuario.nome,
+                        sobrenome: usuario.sobrenome,
                         token: jwt
                     });
                 } else {

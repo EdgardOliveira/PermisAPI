@@ -25,7 +25,7 @@ enum StatusPT {
 }
 
 model Grupo {
-    id          String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id          String      @id @default(auto()) @map("_id") @db.ObjectId
     nome        String      @unique
     status      Status      @default(ATIVO)
     usuarios    Usuario[]
@@ -33,7 +33,7 @@ model Grupo {
 }
 
 model Usuario {
-    id          String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id          String      @id @default(auto()) @map("_id") @db.ObjectId
     nome        String      @unique
     sobrenome   String
     email       String      @unique
@@ -46,8 +46,8 @@ model Usuario {
 }
 
 model Local {
-    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    local                       String
+    id                          String          @id @default(auto()) @map("_id") @db.ObjectId
+    local                       String          @unique
     latitude                    Float
     longitude                   Float
     pt                          PT[]
@@ -56,12 +56,12 @@ model Local {
 }
 
 model Emitente {
-    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id                          String          @id @default(auto()) @map("_id") @db.ObjectId
     nome                        String
     sobrenome                   String
     empresa                     String          @default("Engie")
-    gid                         String
-    email                       String
+    gid                         String          @unique
+    email                       String          @unique
     senha                       String
     telefone                    String
     pt                          PT[]
@@ -70,11 +70,11 @@ model Emitente {
 }
 
 model Requisitante {
-    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id                          String          @id @default(auto()) @map("_id") @db.ObjectId
     nome                        String
     sobrenome                   String
     empresa                     String
-    email                       String
+    email                       String          @unique
     senha                       String
     telefone                    String
     pt                          PT[]
@@ -83,11 +83,11 @@ model Requisitante {
 }
 
 model Executante {
-    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id                          String          @id @default(auto()) @map("_id") @db.ObjectId
     nome                        String
     sobrenome                   String
     empresa                     String
-    email                       String
+    email                       String          @unique
     senha                       String
     telefone                    String
     pt                          PT[]
@@ -96,11 +96,11 @@ model Executante {
 }
 
 model HSE {
-    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id                          String          @id @default(auto()) @map("_id") @db.ObjectId
     nome                        String
     sobrenome                   String
     empresa                     String
-    email                       String
+    email                       String          @unique
     senha                       String
     telefone                    String
     pt                          PT[]
@@ -109,37 +109,27 @@ model HSE {
 }
 
 model APR {
-    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    pdf                         Bytes
-    urlPDF                      String
+    id                          String          @id @default(auto()) @map("_id") @db.ObjectId
+//    pdf                         Bytes
+    urlPDF                      String          @unique
     pt                          PT[]
     status                      Status          @default(ATIVO)
     @@map("aprs")
 }
 
 model OrdemServico {
-    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    pdf                         Bytes
-    urlPDF                      String
+    id                          String          @id @default(auto()) @map("_id") @db.ObjectId
+//    pdf                         Bytes
+    urlPDF                      String          @unique
     pt                          PT[]
     status                      Status          @default(ATIVO)
     @@map("ordens_servico")
 }
 
 model EmpresaTerceirizada {
-    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id                          String          @id @default(auto()) @map("_id") @db.ObjectId
     nome                        String
-    cnpj                        String
-    contrato                    String
-    pt                          PT[]
-    status                      Status          @default(ATIVO)
-    @@map("empresas_terceirizadas")
-}
-
-model EmpresaTerceirizada {
-    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    nome                        String
-    cnpj                        String
+    cnpj                        String          @unique
     contrato                    String
     pt                          PT[]
     status                      Status          @default(ATIVO)
@@ -147,22 +137,23 @@ model EmpresaTerceirizada {
 }
 
 model Secao {
-    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    secao                       String
+    id                          String          @id @default(auto()) @map("_id") @db.ObjectId
+    secao                       String          @unique
     pt                          PT[]
     status                      Status          @default(ATIVO)
     @@map("sessoes")
 }
+
 model TipoTrabalho {
-    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    descricao                   String
+    id                          String          @id @default(auto()) @map("_id") @db.ObjectId
+    descricao                   String          @unique
     pt                          PT[]
     status                      Status          @default(ATIVO)
-    @@map("empresas_terceirizadas")
+    @@map("tipos_trabalho")
 }
 
 model PT {
-    id                          String          @id @default(dbgenerated()) @map("_id") @db.ObjectId
+    id                          String          @id @default(auto()) @map("_id") @db.ObjectId
     criacao                     DateTime        @default(now())
     emissao                     DateTime?
     encerramento                DateTime?
@@ -178,10 +169,10 @@ model PT {
     hse                         HSE             @relation(fields:[hseId], references:[id])
     hseId                       String          @db.ObjectId
     apr                         APR             @relation(fields:[aprId], references:[id])
-    idAPR                       String          @db.ObjectId
+    aprId                       String          @db.ObjectId
     ordemServico                OrdemServico    @relation(fields:[ordemServicoId], references:[id])
     ordemServicoId              String          @db.ObjectId
-    empresaTerceirizada         EmpresaTerceirizada @relation(fields:[empresaTerceirizadaId], references:[id])
+    empresaTerceirizada         EmpresaTerceirizada? @relation(fields:[empresaTerceirizadaId], references:[id])
     empresaTerceirizadaId       String?         @db.ObjectId
     descricao                   String
     tipoTrabalho                TipoTrabalho    @relation(fields:[tipoTrabalhoId], references:[id])
@@ -192,14 +183,14 @@ model PT {
     qtdeTerceirizados           Int?            @default(0)
     qtdeVeiculosLeves           Int?            @default(0)
     qtdeVeiculosPesados         Int?            @default(0)
-    emitenteRevalidacao         Emitente?       @relation(fields:[emitenteRevalidacaoId], references:[id])
-    emitenteRevalidacaoId       String?         @db.ObjectId
-    requisitanteRevalidacao     Requisitante?   @relation(fields:[requisitanteRevalidacaoId], references:[id])
-    requisitanteRevalidacaoId   String?         @db.ObjectId
-    executanteRevalidacao       Executante      @relation(fields:[executanteRevalidacaoId], references:[id])
-    executanteRevalidacaoId     String?         @db.ObjectId
-    hseRevalidacao              HSE             @relation(fields:[hseRevalidacaoId], references:[id])
-    hseRevalidacaoId            String?         @db.ObjectId
+//    emitenteRevalidacao         Emitente?       @relation(fields:[emitenteRevalidacaoId], references:[id])
+//    emitenteRevalidacaoId       String?         @db.ObjectId
+//    requisitanteRevalidacao     Requisitante?   @relation(fields:[requisitanteRevalidacaoId], references:[id])
+//    requisitanteRevalidacaoId   String?         @db.ObjectId
+//    executanteRevalidacao       Executante      @relation(fields:[executanteRevalidacaoId], references:[id])
+//    executanteRevalidacaoId     String?         @db.ObjectId
+//    hseRevalidacao              HSE             @relation(fields:[hseRevalidacaoId], references:[id])
+//    hseRevalidacaoId            String?         @db.ObjectId
     status                      StatusPT        @default(PROGRAMADA)
     @@map("permissoes_trabalho")
 }
