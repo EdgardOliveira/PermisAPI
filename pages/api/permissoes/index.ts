@@ -3,6 +3,7 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {JwtPayload, verify, VerifyErrors} from "jsonwebtoken";
 import {prisma} from "../../../lib/db";
 import {IPT} from "../../../lib/interfaces";
+import {json} from "stream/consumers";
 
 export default autenticado(async function permissoes(req: NextApiRequest, res: NextApiResponse) {
     const metodo = req.method;
@@ -13,22 +14,20 @@ export default autenticado(async function permissoes(req: NextApiRequest, res: N
             break;
         case 'POST':
             cadastrar(req, res);
+            break;
         default:
-            res.setHeader('Allow', ['GET'])
+            res.setHeader('Allow', ['GET', 'POST'])
             res.status(405).end(`Método: ${metodo} não é permitido para esta rota`);
     }
 });
 
 export async function cadastrar(req: NextApiRequest, res: NextApiResponse) {
     const pt: IPT | undefined = req.body;
-    // const local: ILocal | undefined = req.body.local;
-    // const paciente: IPaciente | undefined = req.body.paciente;
-    // const medico: IMedico | undefined = req.body.medico;
-    // const medicamentos: IMedicamento[] | undefined = req.body.receita.medicamentos;
+
+    console.log(JSON.stringify(pt, null, 2));
 
     try {
         //verificando se os campos foram fornecidos
-        // if (!empresa || !paciente || !medico || !medicamentos) {
         if (!pt) {
             return res.status(400).json({
                 sucesso: false,
@@ -36,6 +35,8 @@ export async function cadastrar(req: NextApiRequest, res: NextApiResponse) {
             })
         }
 
+
+        console.log("Cadastrando...")
         const resultado = await prisma.pT.create({
             data: {
                 local: {
@@ -171,14 +172,18 @@ export async function cadastrar(req: NextApiRequest, res: NextApiResponse) {
             },
         });
 
+        console.log("Resultado:")
+        console.log(JSON.stringify(resultado, null, 2))
+
         //retornando o resultado
         return res.status(201).json({
             sucesso: true,
             mensagem: "Registro inserido com sucesso!",
-            receita: resultado,
+            permissaoTrabalho: resultado,
         });
-    } catch
-        (e) {
+
+        console.log("enviando retorno...")
+    } catch (e) {
         if (e instanceof Error) {
             return res.status(500).json({
                 sucesso: false,
@@ -210,7 +215,10 @@ export async function obterTodas(req: NextApiRequest, res: NextApiResponse) {
             where: {
                 gid: String(gid)
             }
-        });
+        })
+
+        console.log("gid")
+        console.log(JSON.stringify(gid, null, 2))
 
         //verificando se os campos foram fornecidos
         if (emitente == null) {
@@ -237,7 +245,7 @@ export async function obterTodas(req: NextApiRequest, res: NextApiResponse) {
             feedback.mensagem = "Registro recuperado com sucesso!";
         } else {
             feedback.sucesso = false;
-            feedback.mensagem = `Nenhuma permissão de trabalho registrada o emitente com id:${emitente.id} foi encontrado no banco de dados.`;
+            feedback.mensagem = `Nenhuma permissão de trabalho registrada para o emitente com id:${emitente.id} foi encontrado no banco de dados.`;
         }
 
         if (feedback.sucesso) {
